@@ -1,5 +1,5 @@
 [lint]
-pylint sate.py
+pylint sate.py test_sate.py
 
 [format]
-yapf -i sate.py
+yapf -i sate.py test_sate.py
