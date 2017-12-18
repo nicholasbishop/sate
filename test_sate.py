@@ -14,6 +14,11 @@ class TestSate(unittest.TestCase):
         lines = sate.read_stripped_nonempty_lines(rfile)
         self.assertEqual(list(lines), expected)
 
+    def _check_parse(self, text, expected):
+        rfile = io.StringIO(text)
+        self.assertEqual(sate.SateFile().parse_file(rfile),
+                         sate.SateFile(expected))
+
     def test_read_lines(self):
         self._check_read_lines('a', ['a'])
 
@@ -22,6 +27,9 @@ class TestSate(unittest.TestCase):
 
     def test_read_lines_trim(self):
         self._check_read_lines('a\n', ['a'])
+
+    def test_parse_target(self):
+        self._check_parse('[a]', {'a': sate.Target('a')})
 
 
 if __name__ == '__main__':

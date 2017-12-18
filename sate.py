@@ -38,6 +38,10 @@ class Target(object):
         self._name = name
         self._commands = []
 
+    def __eq__(self, other):
+        return (self._name == other._name and
+                self._commands == other._commands)
+
     @property
     def name(self):
         return self._name
@@ -77,8 +81,11 @@ def read_stripped_nonempty_lines(rfile):
 
 
 class SateFile(object):
-    def __init__(self):
-        self._targets = {}
+    def __init__(self, targets=None):
+        self._targets = targets or {}
+
+    def __eq__(self, other):
+        return self._targets == other._targets
 
     @classmethod
     def parse_file(cls, rfile):
