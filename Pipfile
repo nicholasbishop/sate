@@ -1,0 +1,20 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+yapf = "*"
+pylint = "*"
+
+
+[dev-packages]
+
+
+
+[requires]
+
+python_version = "2.7"
