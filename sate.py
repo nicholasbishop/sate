@@ -8,6 +8,7 @@ import subprocess
 
 LOG = logging.getLogger('sate')
 
+
 class Command(object):
     # TODO(nicholasbishop): tags
     def __init__(self, command, tags=None):
@@ -105,8 +106,7 @@ class SateFile(object):
 
     def _add_target(self, target):
         if target.name in self._targets:
-            raise KeyError('target {} already exists'.format(
-                target.name))
+            raise KeyError('target {} already exists'.format(target.name))
         LOG.debug('adding target: %s', target.name)
         self._targets[target.name] = target
 

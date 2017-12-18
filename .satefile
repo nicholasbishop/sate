@@ -1,12 +1,5 @@
 [lint]
-pylint *.py
+pylint sate.py
 
 [format]
-yapf -i *.py
-
-[build]
-[nofail] mkdir build1 \
-build2
-
-[clean]
-[nofail] rm -r build build2 build3
+yapf -i sate.py
