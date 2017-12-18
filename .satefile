@@ -1,0 +1,12 @@
+[lint]
+pylint *.py
+
+[format]
+yapf -i *.py
+
+[build]
+[nofail] mkdir build1 \
+build2
+
+[clean]
+[nofail] rm -r build build2 build3
