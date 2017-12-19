@@ -87,6 +87,10 @@ class SateFile(object):
     def __eq__(self, other):
         return self._targets == other._targets
 
+    @property
+    def targets(self):
+        return self._targets
+
     @classmethod
     def parse_file(cls, rfile):
         satefile = cls()
@@ -121,10 +125,16 @@ class SateFile(object):
         self._targets[target].run(args)
 
 
+def list_targets(satefile):
+    for name in sorted(satefile.targets):
+        print(name)
+
+
 def parse_command_line():
     parser = argparse.ArgumentParser(description='run tasks')
     parser.add_argument('-f', '--filename', default='.satefile')
-    parser.add_argument('target')
+    parser.add_argument('-l', '--list', action='store_true')
+    parser.add_argument('target', nargs='?')
     parser.add_argument('args', nargs=argparse.REMAINDER)
     return parser.parse_args()
 
@@ -135,6 +145,10 @@ def main():
 
     with open(cl_args.filename) as rfile:
         satefile = SateFile.parse_file(rfile)
+
+    if cl_args.list:
+        list_targets(satefile)
+        return
 
     # TODO(nicholasbishop): add multiple targets to command line?
     satefile.run_target(cl_args.target, cl_args.args)
