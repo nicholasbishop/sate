@@ -6,3 +6,9 @@ yapf -i sate.py test_sate.py
 
 [package]
 ./setup.py sdist bdist_wheel
+
+[publish]
+twine upload dist/*
+
+[bump-minor]
+bumpversion minor
