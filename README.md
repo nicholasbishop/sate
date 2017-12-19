@@ -14,9 +14,10 @@ This defines a target called `lint`. Running `sate lint` calls `pylint *.py`.
 
 ## Syntax
 
-All of sate's syntax sits inside brackets. A line containing only  `[name]` defines a new target.
+All of sate's syntax sits inside brackets. A line containing only  `[name]` defines a new target. Each line after a target is a new command.
 
 ## TODO
 
 - Variables
-- Other tags such as [nofail]
+- Other tags such as `[nofail]`
+- Line continuations (`\`)
