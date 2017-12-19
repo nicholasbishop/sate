@@ -31,6 +31,10 @@ class TestSate(unittest.TestCase):
     def test_parse_target(self):
         self._check_parse('[a]', {'a': sate.Target('a')})
 
+    def test_parse_variable(self):
+        sat = sate.SateFile.parse('[var="a"]')
+        self.assertEqual(sat.variables, {'var': 'a'})
+
 
 if __name__ == '__main__':
     unittest.main()

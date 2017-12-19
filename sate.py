@@ -3,10 +3,28 @@
 from __future__ import print_function
 
 import argparse
+import io
 import logging
 import subprocess
 
 LOG = logging.getLogger('sate')
+
+
+class Tag(object):
+    @classmethod
+    def parse(cls, line):
+        # TODO(nicholasbishop): handle strings with interior ']'
+        line = line.strip()
+        if not line.startswith('['):
+            return None, line
+        close = line.index(']')
+        if close == -1:
+            return None, line
+        return (cls.parse_inner(line[1:close]), line[close + 1:])
+
+    @classmethod
+    def parse_inner(cls, inner):
+        pass
 
 
 class Command(object):
@@ -62,16 +80,6 @@ class Target(object):
             command.run(args)
 
 
-def parse_tag(line):
-    line = line.strip()
-    if not line.startswith('['):
-        return None, line
-    close = line.index(']')
-    if close == -1:
-        return None, line
-    return (line[1:close], line[close + 1:])
-
-
 def read_stripped_nonempty_lines(rfile):
     for line in rfile.readlines():
         line = line.strip()
@@ -81,11 +89,20 @@ def read_stripped_nonempty_lines(rfile):
 
 
 class SateFile(object):
-    def __init__(self, targets=None):
+    def __init__(self, targets=None, variables=None):
         self._targets = targets or {}
+        self._variables = variables or {}
 
     def __eq__(self, other):
         return self._targets == other._targets
+
+    @property
+    def targets(self):
+        return self._targets
+
+    @property
+    def variables(self):
+        return self._variables
 
     @classmethod
     def parse_file(cls, rfile):
@@ -94,7 +111,7 @@ class SateFile(object):
         for line in read_stripped_nonempty_lines(rfile):
             LOG.debug('line="%s"', line)
 
-            tag, rest = parse_tag(line)
+            tag, rest = Tag.parse(line)
             LOG.debug('tag="%s"', tag)
             LOG.debug('rest="%s"', rest)
             if tag is None:
@@ -110,6 +127,18 @@ class SateFile(object):
                 pass
 
         return satefile
+
+    @classmethod
+    def parse_string(cls, text):
+        rfile = io.StringIO(text)
+        return cls.parse_file(rfile)
+
+    @classmethod
+    def parse(cls, src):
+        if hasattr(src, 'readlines'):
+            return cls.parse_file(src)
+        else:
+            return cls.parse_string(src)
 
     def _add_target(self, target):
         if target.name in self._targets:
