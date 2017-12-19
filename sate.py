@@ -9,6 +9,9 @@ import subprocess
 LOG = logging.getLogger('sate')
 
 
+VERSION = '1.0'
+
+
 class Command(object):
     # TODO(nicholasbishop): tags
     def __init__(self, command, tags=None):

@@ -13,6 +13,7 @@ pylint = "*"
 
 [dev-packages]
 
+setuptools = "*"
 
 
 [requires]
