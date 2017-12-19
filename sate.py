@@ -39,8 +39,8 @@ class Target(object):
         self._commands = []
 
     def __eq__(self, other):
-        return (self._name == other._name and
-                self._commands == other._commands)
+        return (self._name == other._name
+                and self._commands == other._commands)
 
     @property
     def name(self):
