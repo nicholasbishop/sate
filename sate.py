@@ -39,12 +39,16 @@ class Target(object):
         self._commands = []
 
     def __eq__(self, other):
-        return (self._name == other._name
-                and self._commands == other._commands)
+        return (self.name == other.name
+                and self.commands == other.commands)
 
     @property
     def name(self):
         return self._name
+
+    @property
+    def commands(self):
+        return self._commands
 
     def add_command(self, line):
         self._commands.append(Command(line))
@@ -85,7 +89,7 @@ class SateFile(object):
         self._targets = targets or {}
 
     def __eq__(self, other):
-        return self._targets == other._targets
+        return self.targets == other.targets
 
     @property
     def targets(self):
@@ -105,7 +109,7 @@ class SateFile(object):
                 target.add_command(rest)
             elif not rest:
                 target = Target(tag)
-                satefile._add_target(target)
+                satefile.add_target(target)
             else:
                 target.add_command_with_tag(tag, rest)
 
@@ -115,7 +119,7 @@ class SateFile(object):
 
         return satefile
 
-    def _add_target(self, target):
+    def add_target(self, target):
         if target.name in self._targets:
             raise KeyError('target {} already exists'.format(target.name))
         LOG.debug('adding target: %s', target.name)
