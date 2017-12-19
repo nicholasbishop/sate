@@ -9,11 +9,13 @@ name = "pypi"
 
 yapf = "*"
 pylint = "*"
+twine = "*"
 
 
 [dev-packages]
 
 setuptools = "*"
+bumpversion = "*"
 
 
 [requires]
