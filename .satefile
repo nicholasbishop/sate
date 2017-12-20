@@ -13,4 +13,4 @@ yapf -i sate.py test_sate.py
 twine upload dist/*
 
 [bump-minor dep(format, lint)]
-bumpversion minor
+bumpversion minor \ No newline at end of file

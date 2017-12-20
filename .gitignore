@@ -1,4 +1,2 @@
-*.pyc
-__pycache__/
-sate.egg-info/
-dist/
+/target/
+**/*.rs.bk

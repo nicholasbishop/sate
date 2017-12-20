@@ -1,0 +1,59 @@
+use super::{Call, Command, Directive, SateFile, Target, TargetHeader};
+
+ws = " "+
+eol = [\n\r]
+not_eol = [^\n\r]
+alpha = [a-zA-Z]
+digit = [0-9]
+
+pub ident -> String = ident:$(alpha (alpha / digit)*) {
+    ident.to_string()
+}
+
+pub arg_list -> Vec<String> = ident ** ws
+
+pub call -> Call = name:ident "(" args:arg_list ")" {
+    Call::new(name, args)
+}
+
+directive -> Directive = calls:(call ++ ws) {
+    Directive(calls)
+}
+
+target_header_simple -> TargetHeader = name:ident {
+    TargetHeader { name, calls: vec![] }
+}
+
+target_header_with_calls -> TargetHeader =
+    name:ident ws calls:(call ** ws) {
+        TargetHeader { name, calls }
+}
+
+pub tag_target_header -> TargetHeader =
+    "[" t:(target_header_with_calls / target_header_simple) "]" {
+        t
+}
+
+pub tag_directive -> Directive = "[" d:(directive) "]" {
+    d
+}
+
+command_code -> String = code:$(not_eol+) {
+    code.to_string()
+}
+
+pub command -> Command = directive:tag_directive? !tag_target_header code:command_code eol {
+    Command::new(directive, code)
+}
+
+pub target -> Target = header:tag_target_header eol commands:command+ eol* {
+    Target { header, commands }
+}
+
+pub satefile -> SateFile = targets:target* {
+    let mut satefile = SateFile::new();
+    for target in targets.iter() {
+        satefile.add_target(target.clone());
+    }
+    satefile
+}
