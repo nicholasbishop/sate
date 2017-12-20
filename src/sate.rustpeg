@@ -1,0 +1,32 @@
+ws = " "+
+alpha = [a-zA-Z]
+digit = [0-9]
+
+pub ident -> String = ident:$(alpha (alpha / digit)*) {
+    ident.to_string()
+}
+
+pub arg_list -> Vec<String> = ident ** ws
+
+pub call -> super::Call = name:ident "(" args:arg_list ")" {
+    super::Call::new(name, args)
+}
+
+directive -> super::Tag = calls:(call ** ws) {
+    super::Tag::directive(calls)
+}
+
+simple_target -> super::Tag = name:ident {
+    super::Tag::target(name, vec![])
+}
+
+target_with_calls -> super::Tag = name:ident ws calls:(call ** ws) {
+    super::Tag::target(name, calls)
+}
+
+//pub target -> super::Tag = target_with_calls / simple_target
+
+pub tag -> super::Tag = "[" choice:(target_with_calls / directive / simple_target) "]" {
+    println!("{:#?}", choice);
+    choice
+}
