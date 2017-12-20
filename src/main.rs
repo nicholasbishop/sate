@@ -98,7 +98,11 @@ impl SateFile {
     fn run_target(&self, target_name: &str) {
         if let Some(target) = self.targets.get(target_name) {
             for command in target.commands.iter() {
-                subprocess::Exec::shell(&command.code).join();
+                let res = subprocess::Exec::shell(&command.code).join();
+                // TODO(nicholasbishop): better error handling
+                if res.is_err() {
+                    panic!("error: target failed");
+                }
             }
         } else {
             println!("error: target '{}' does not exist", target_name);
@@ -135,6 +139,8 @@ fn main() {
         print_targets(&satefile);
     } else if let Some(target) = matches.value_of("TARGET") {
         satefile.run_target(target);
+    } else {
+        println!("no target specified");
     }
 }
 
