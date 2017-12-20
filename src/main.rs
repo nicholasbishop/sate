@@ -1,4 +1,5 @@
 extern crate clap;
+extern crate subprocess;
 
 use clap::App;
 use parse::ParseError;
@@ -95,8 +96,10 @@ impl SateFile {
     }
 
     fn run_target(&self, target_name: &str) {
-        if let Some(_target) = self.targets.get(target_name) {
-            println!("pretending to run {}", _target.name());
+        if let Some(target) = self.targets.get(target_name) {
+            for command in target.commands.iter() {
+                subprocess::Exec::shell(&command.code).join();
+            }
         } else {
             println!("error: target '{}' does not exist", target_name);
         }
