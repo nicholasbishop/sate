@@ -59,6 +59,10 @@ impl Target {
     pub fn new(header: TargetHeader, commands: Vec<Command>) -> Target {
         Target { header: header, commands: commands }
     }
+
+    pub fn name(&self) -> &str {
+        &self.header.name
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -89,20 +93,46 @@ impl SateFile {
         let name = target.header.name.clone();
         self.targets.insert(name, target);
     }
+
+    fn run_target(&self, target_name: &str) {
+        if let Some(_target) = self.targets.get(target_name) {
+            println!("pretending to run {}", _target.name());
+        } else {
+            println!("error: target '{}' does not exist", target_name);
+        }
+    }
 }
 
 mod parse {
     include!(concat!(env!("OUT_DIR"), "/sate.rs"));
 }
 
+fn print_targets(satefile: &SateFile) {
+    for (name, _target) in satefile.targets.iter() {
+        println!("{}", name);
+    }
+}
+
 fn main() {
     // TODO(nicholasbishop): add command line option for file and
     // target
-    App::new("sate").get_matches();
+    let matches = App::new("sate")
+        .about("Run a task")
+        .version("0.1.0")
+        .args_from_usage(
+            "-l, --list 'list all targets'
+             [TARGET]   'name of target to execute'")
+        .get_matches();
 
     let default_path = Path::new(".satefile");
-    let satefile = SateFile::parse_from_file(default_path);
-    println!("{:#?}", satefile);
+    // TODO(nicholasbishop): fix unwrap
+    let satefile = SateFile::parse_from_file(default_path).unwrap();
+
+    if matches.is_present("list") {
+        print_targets(&satefile);
+    } else if let Some(target) = matches.value_of("TARGET") {
+        satefile.run_target(target);
+    }
 }
 
 
