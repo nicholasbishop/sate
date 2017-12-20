@@ -1,5 +1,0 @@
-[lint]
-pylint *.py
-
-sshfs nbishop@192.168.1.8:/mnt/btr /mnt/btr -C -o ro,allow_other
-sudo 

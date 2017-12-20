@@ -1,9 +1,10 @@
-// #[macro_use]
-// extern crate nom;
+use parse::ParseError;
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
 
-// named!(ident<&str>, chain!(is_alphabetic >> is_alphanumeric));
-
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Call {
     name: String,
     args: Vec<String>,
@@ -18,10 +19,10 @@ impl Call {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Directive(Vec<Call>);
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct TargetHeader {
     name: String,
     calls: Vec<Call>,
@@ -33,7 +34,7 @@ impl TargetHeader {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Command {
     directive: Option<Directive>,
     code: String,
@@ -45,7 +46,7 @@ impl Command {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Target {
     header: TargetHeader,
     commands: Vec<Command>,
@@ -57,12 +58,43 @@ impl Target {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct SateFile {
+    path: String,
+    targets: HashMap<String, Target>,
+}
+
+impl SateFile {
+    fn new() -> SateFile {
+        SateFile { path: "".to_string(), targets: HashMap::new() }
+    }
+
+    fn parse_string(text: &str) -> Result<SateFile, ParseError> {
+        return parse::satefile(text);
+    }
+
+    fn parse_from_file(path: &Path) -> Result<SateFile, ParseError> {
+        // TODO, remove unwrap()s
+        let mut file = File::open(path).unwrap();
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).unwrap();
+        SateFile::parse_string(&contents)
+    }
+
+    fn add_target(&mut self, target: Target) {
+        // TODO(nicholasbishop): handle duplicate targets better
+        let name = target.header.name.clone();
+        self.targets.insert(name, target);
+    }
+}
+
 mod parse {
     include!(concat!(env!("OUT_DIR"), "/sate.rs"));
 }
 
 fn main() {
-    
+    let satefile = SateFile::parse_from_file(Path::new(".satefile"));
+    println!("{:#?}", satefile);
 }
 
 
@@ -122,13 +154,15 @@ mod tests {
 
     #[test]
     fn test_satefile() {
-        assert_eq!(parse::satefile("[a]\nb\n[c]\nd\n").unwrap(), vec![
-            Target::new(
-                TargetHeader::new("a", vec![]),
-                vec![Command::new(None, "b")]),
-            Target::new(
-                TargetHeader::new("c", vec![]),
-                vec![Command::new(None, "d")])
-        ]);
+        let mut satefile = SateFile::new();
+        satefile.add_target(Target::new(
+            TargetHeader::new("a", vec![]),
+            vec![Command::new(None, "b")]));
+        satefile.add_target(Target::new(
+            TargetHeader::new("c", vec![]),
+            vec![Command::new(None, "d")]));
+        assert_eq!(
+            parse::satefile("[a]\nb\n[c]\nd\n").unwrap(),
+            satefile);
     }
 }

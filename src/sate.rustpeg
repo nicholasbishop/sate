@@ -1,4 +1,4 @@
-use super::{Call, Command, Directive, Target, TargetHeader};
+use super::{Call, Command, Directive, SateFile, Target, TargetHeader};
 
 ws = " "+
 eol = [\n\r]
@@ -50,4 +50,10 @@ pub target -> Target = header:tag_target_header eol commands:command+ {
     Target { header, commands }
 }
 
-pub satefile -> Vec<Target> = target*
+pub satefile -> SateFile = targets:target* {
+    let mut satefile = SateFile::new();
+    for target in targets.iter() {
+        satefile.add_target(target.clone());
+    }
+    satefile
+}
