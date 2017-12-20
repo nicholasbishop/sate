@@ -1,0 +1,16 @@
+whitespace = _{ " " }
+
+alpha = { 'a'..'z' | 'A'..'Z' }
+digit = { '0'..'9' }
+
+ident = @{ alpha ~ (alpha | digit)* }
+
+arg_list = _{ "(" ~ ident* ~ ")" }
+
+call = @{ ident ~ arg_list }
+
+target = { "[" ~ ident ~ call* ~ "]" }
+
+directive = { "[" ~ call* ~ "]" }
+
+tag = _{ target | directive }
