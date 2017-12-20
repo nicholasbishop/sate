@@ -4,6 +4,9 @@
 focuses on task automation rather than building. By default `sate`
 looks for a file called `.satefile`.
 
+* https://crates.io/crates/sate
+* https://github.com/nicholasbishop/sate
+
 ## A very simple example
 
 `.satefile`:
