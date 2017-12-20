@@ -1,6 +1,6 @@
 [package]
 name = "sate"
-version = "0.1.1"
+version = "0.1.2-alpha.0"
 authors = ["Nicholas Bishop <nicholasbishop@gmail.com>"]
 license = "Apache-2.0"
 description = "Simple command-line task runner"
