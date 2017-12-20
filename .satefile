@@ -1,4 +1,5 @@
 [lint]
 pylint *.py
+
 [format]
 yapf *.py

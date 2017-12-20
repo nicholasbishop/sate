@@ -46,7 +46,7 @@ pub command -> Command = directive:tag_directive? !tag_target_header code:comman
     Command::new(directive, code)
 }
 
-pub target -> Target = header:tag_target_header eol commands:command+ {
+pub target -> Target = header:tag_target_header eol commands:command+ eol* {
     Target { header, commands }
 }
 

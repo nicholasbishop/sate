@@ -162,7 +162,7 @@ mod tests {
             TargetHeader::new("c", vec![]),
             vec![Command::new(None, "d")]));
         assert_eq!(
-            parse::satefile("[a]\nb\n[c]\nd\n").unwrap(),
+            parse::satefile("[a]\nb\n\n[c]\nd\n").unwrap(),
             satefile);
     }
 }
