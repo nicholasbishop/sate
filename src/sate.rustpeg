@@ -1,7 +1,8 @@
-use super::{Call, Command, Directive, Tag, TargetHeader};
+use super::{Call, Command, Directive, TargetHeader};
 
 ws = " "+
-eol = [\n\r]+
+eol = [\n\r]
+not_eol = [^\n\r]
 alpha = [a-zA-Z]
 digit = [0-9]
 
@@ -28,18 +29,20 @@ target_header_with_calls -> TargetHeader =
         TargetHeader { name, calls }
 }
 
-tag_target_header -> Tag =
+pub tag_target_header -> TargetHeader =
     "[" t:(target_header_with_calls / target_header_simple) "]" {
-        Tag::Target(t)
+        t
 }
 
-tag_directive -> Tag = "[" d:(directive) "]" {
-    Tag::Directive(d)
+pub tag_directive -> Directive = "[" d:(directive) "]" {
+    d
 }
 
-pub tag -> Tag = tag_directive / tag_target_header
+command_code -> String = code:$(not_eol+) {
+    code.to_string()
+}
 
-pub command -> Command = directive:directive? code:$(.+) eol {
+pub command -> Command = directive:tag_directive? code:command_code eol {
     Command::new(directive, code)
 }
 

@@ -27,19 +27,9 @@ pub struct TargetHeader {
     calls: Vec<Call>,
 }
 
-#[derive(Debug, PartialEq)]
-pub enum Tag {
-    Directive(Directive),
-    Target(TargetHeader),
-}
-
-impl Tag {
-    fn directive(calls: Vec<Call>) -> Tag {
-        Tag::Directive(Directive(calls))
-    }
-
-    fn target<S: Into<String>>(name: S, calls: Vec<Call>) -> Tag {
-        Tag::Target(TargetHeader { name: name.into(), calls: calls })
+impl TargetHeader {
+    fn new<S: Into<String>>(name: S, calls: Vec<Call>) -> TargetHeader {
+        TargetHeader { name: name.into(), calls: calls }
     }
 }
 
@@ -94,18 +84,20 @@ mod tests {
 
     #[test]
     fn test_tag_directive() {
-        assert_eq!(parse::tag("[a()]").unwrap(),
-                   Tag::directive(vec![Call::new("a", vec![])]));
+        assert_eq!(parse::tag_directive("[a()]").unwrap(),
+                   Directive(vec![Call::new("a", vec![])]));
     }
 
     #[test]
     fn test_tag_target_simple() {
-        assert_eq!(parse::tag("[a]").unwrap(), Tag::target("a", vec![]));
+        assert_eq!(parse::tag_target_header("[a]").unwrap(),
+                   TargetHeader::new("a", vec![]));
     }
 
     #[test]
     fn test_tag_target_with_call() {
-        assert_eq!(parse::tag("[a b()]").unwrap(), Tag::target("a", vec![Call::new("b", vec![])]));
+        assert_eq!(parse::tag_target_header("[a b()]").unwrap(),
+                   TargetHeader::new("a", vec![Call::new("b", vec![])]));
     }
 
     #[test]
