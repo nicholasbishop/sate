@@ -1,4 +1,4 @@
-use super::{Call, Command, Directive, TargetHeader};
+use super::{Call, Command, Directive, Target, TargetHeader};
 
 ws = " "+
 eol = [\n\r]
@@ -46,4 +46,6 @@ pub command -> Command = directive:tag_directive? code:command_code eol {
     Command::new(directive, code)
 }
 
-// pub target = tag_target_header nl command+
+pub target -> Target = header:tag_target_header eol commands:command+ {
+    Target { header, commands }
+}

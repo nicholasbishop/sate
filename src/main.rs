@@ -104,4 +104,12 @@ mod tests {
     fn test_command() {
         assert_eq!(parse::command("a\n").unwrap(), Command::new(None, "a"));
     }
+
+    #[test]
+    fn test_target() {
+        assert_eq!(parse::target("[a]\nfoo\n").unwrap(), Target {
+            header: TargetHeader::new("a", vec![]),
+            commands: vec![Command::new(None, "foo")]
+        });
+    }
 }
