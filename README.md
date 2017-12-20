@@ -17,13 +17,17 @@ This defines a target called `lint`. Running `sate lint` calls `pylint
 
 ## Syntax
 
-All of sate's syntax sits inside brackets. Everything outside the
-brackets is either a comment or a command. Comments start with a `#`
-and last through the end of the line.
+A target begins with a bracketed name on its own line, for example
+`[lint]`. Everything after a target name is a command. A command is
+just a subprocess executed in a shell (so you can use shell syntax
+such as pipes in the command). There can be any number of commands in
+a target. Commands are run in the order they are defined. Execution
+stops if any command exits with a non-zero value.
 
-### Targets
-A line containing only `[name]` defines a new target. Each line after
-a target is a new command.
+Each command can optionally begin with a directive, which is a
+bracketed list of calls. Example: `[nofail()] mkdir test`. This
+defines a `mkdir` command that never fails, i.e. a non-zero exit code
+is ignored.
 
 ## TODO
 
