@@ -1,3 +1,6 @@
+extern crate clap;
+
+use clap::App;
 use parse::ParseError;
 use std::collections::HashMap;
 use std::fs::File;
@@ -29,7 +32,7 @@ pub struct TargetHeader {
 }
 
 impl TargetHeader {
-    fn new<S: Into<String>>(name: S, calls: Vec<Call>) -> TargetHeader {
+    pub fn new<S: Into<String>>(name: S, calls: Vec<Call>) -> TargetHeader {
         TargetHeader { name: name.into(), calls: calls }
     }
 }
@@ -53,7 +56,7 @@ pub struct Target {
 }
 
 impl Target {
-    fn new(header: TargetHeader, commands: Vec<Command>) -> Target {
+    pub fn new(header: TargetHeader, commands: Vec<Command>) -> Target {
         Target { header: header, commands: commands }
     }
 }
@@ -93,7 +96,12 @@ mod parse {
 }
 
 fn main() {
-    let satefile = SateFile::parse_from_file(Path::new(".satefile"));
+    // TODO(nicholasbishop): add command line option for file and
+    // target
+    App::new("sate").get_matches();
+
+    let default_path = Path::new(".satefile");
+    let satefile = SateFile::parse_from_file(default_path);
     println!("{:#?}", satefile);
 }
 
