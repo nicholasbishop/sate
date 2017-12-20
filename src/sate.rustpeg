@@ -1,6 +1,7 @@
-use super::{Call, Tag};
+use super::{Call, Command, Directive, Tag, TargetHeader};
 
 ws = " "+
+eol = [\n\r]+
 alpha = [a-zA-Z]
 digit = [0-9]
 
@@ -14,24 +15,32 @@ pub call -> Call = name:ident "(" args:arg_list ")" {
     Call::new(name, args)
 }
 
-pub directive -> Tag = calls:(call ++ ws) {
-    Tag::directive(calls)
+directive -> Directive = calls:(call ++ ws) {
+    Directive(calls)
 }
 
-pub target_simple -> Tag = name:ident {
-    Tag::target(name, vec![])
+target_header_simple -> TargetHeader = name:ident {
+    TargetHeader { name, calls: vec![] }
 }
 
-pub target_with_calls -> Tag = name:ident ws calls:(call ** ws) {
-    Tag::target(name, calls)
+target_header_with_calls -> TargetHeader =
+    name:ident ws calls:(call ** ws) {
+        TargetHeader { name, calls }
 }
 
-pub tag_target -> Tag = "[" t:(target_with_calls / target_simple) "]" {
-    t
+tag_target_header -> Tag =
+    "[" t:(target_header_with_calls / target_header_simple) "]" {
+        Tag::Target(t)
 }
 
-pub tag_directive -> Tag = "[" d:(directive) "]" {
-    d
+tag_directive -> Tag = "[" d:(directive) "]" {
+    Tag::Directive(d)
 }
 
-pub tag -> Tag = tag_directive / tag_target
+pub tag -> Tag = tag_directive / tag_target_header
+
+pub command -> Command = directive:directive? code:$(.+) eol {
+    Command::new(directive, code)
+}
+
+// pub target = tag_target_header nl command+

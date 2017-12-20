@@ -19,22 +19,46 @@ impl Call {
 }
 
 #[derive(Debug, PartialEq)]
+pub struct Directive(Vec<Call>);
+
+#[derive(Debug, PartialEq)]
+pub struct TargetHeader {
+    name: String,
+    calls: Vec<Call>,
+}
+
+#[derive(Debug, PartialEq)]
 pub enum Tag {
-    Directive(Vec<Call>),
-    Target {
-        name: String,
-        calls: Vec<Call>,
-    },
+    Directive(Directive),
+    Target(TargetHeader),
 }
 
 impl Tag {
     fn directive(calls: Vec<Call>) -> Tag {
-        Tag::Directive(calls)
+        Tag::Directive(Directive(calls))
     }
 
     fn target<S: Into<String>>(name: S, calls: Vec<Call>) -> Tag {
-        Tag::Target { name: name.into(), calls: calls }
+        Tag::Target(TargetHeader { name: name.into(), calls: calls })
     }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Command {
+    directive: Option<Directive>,
+    code: String,
+}
+
+impl Command {
+    fn new<S: Into<String>>(directive: Option<Directive>, code: S) -> Command {
+        Command { directive, code: code.into() }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Target {
+    header: TargetHeader,
+    commands: Vec<Command>,
 }
 
 mod parse {
@@ -69,25 +93,6 @@ mod tests {
     }
 
     #[test]
-    fn test_directive() {
-        assert_eq!(parse::directive("a() b(c)").unwrap(),
-                   Tag::directive(vec![Call::new("a", vec![]),
-                                       Call::new("b", vec!["c"])]));
-    }
-
-    #[test]
-    fn test_target_simple() {
-        assert_eq!(parse::target_simple("abc").unwrap(),
-                   Tag::target("abc", vec![]));
-    }
-
-    #[test]
-    fn test_target_with_call() {
-        assert_eq!(parse::target_with_calls("abc foo(bar)").unwrap(),
-                   Tag::target("abc", vec![Call::new("foo", vec!["bar"])]));
-    }
-
-    #[test]
     fn test_tag_directive() {
         assert_eq!(parse::tag("[a()]").unwrap(),
                    Tag::directive(vec![Call::new("a", vec![])]));
@@ -101,5 +106,10 @@ mod tests {
     #[test]
     fn test_tag_target_with_call() {
         assert_eq!(parse::tag("[a b()]").unwrap(), Tag::target("a", vec![Call::new("b", vec![])]));
+    }
+
+    #[test]
+    fn test_command() {
+        assert_eq!(parse::command("a\n").unwrap(), Command::new(None, "a"));
     }
 }
