@@ -68,28 +68,38 @@ mod tests {
         assert_eq!(parse::call("a(b cd)").unwrap(), Call::new("a", vec!["b", "cd"]));
     }
 
-    // #[test]
-    // fn test_directive() {
-    //     assert_eq!(parse::directive("a() b(c)").unwrap(),
-    //                Tag::directive(vec![Call::new("a", vec![]),
-    //                                    Call::new("b", vec!["c"])]));
-    // }
-
-    // #[test]
-    // fn test_target() {
-    //     assert_eq!(parse::target("abc").unwrap(), Tag::target("abc", vec![]));
-    //     assert_eq!(parse::target("abc foo(bar)").unwrap(),
-    //                Tag::target("abc", vec![Call::new("foo", vec!["bar"])]));
-    // }
+    #[test]
+    fn test_directive() {
+        assert_eq!(parse::directive("a() b(c)").unwrap(),
+                   Tag::directive(vec![Call::new("a", vec![]),
+                                       Call::new("b", vec!["c"])]));
+    }
 
     #[test]
-    fn test_tag_target() {
-        assert_eq!(parse::tag("[abc]").unwrap(), Tag::target("abc", vec![]));
+    fn test_target_simple() {
+        assert_eq!(parse::target_simple("abc").unwrap(),
+                   Tag::target("abc", vec![]));
+    }
+
+    #[test]
+    fn test_target_with_call() {
+        assert_eq!(parse::target_with_calls("abc foo(bar)").unwrap(),
+                   Tag::target("abc", vec![Call::new("foo", vec!["bar"])]));
     }
 
     #[test]
     fn test_tag_directive() {
-        assert_eq!(parse::tag("[abc()]").unwrap(),
-                   Tag::directive(vec![Call::new("abc", vec![])]));
+        assert_eq!(parse::tag("[a()]").unwrap(),
+                   Tag::directive(vec![Call::new("a", vec![])]));
+    }
+
+    #[test]
+    fn test_tag_target_simple() {
+        assert_eq!(parse::tag("[a]").unwrap(), Tag::target("a", vec![]));
+    }
+
+    #[test]
+    fn test_tag_target_with_call() {
+        assert_eq!(parse::tag("[a b()]").unwrap(), Tag::target("a", vec![Call::new("b", vec![])]));
     }
 }

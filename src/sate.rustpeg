@@ -1,3 +1,5 @@
+use super::{Call, Tag};
+
 ws = " "+
 alpha = [a-zA-Z]
 digit = [0-9]
@@ -8,25 +10,28 @@ pub ident -> String = ident:$(alpha (alpha / digit)*) {
 
 pub arg_list -> Vec<String> = ident ** ws
 
-pub call -> super::Call = name:ident "(" args:arg_list ")" {
-    super::Call::new(name, args)
+pub call -> Call = name:ident "(" args:arg_list ")" {
+    Call::new(name, args)
 }
 
-directive -> super::Tag = calls:(call ** ws) {
-    super::Tag::directive(calls)
+pub directive -> Tag = calls:(call ++ ws) {
+    Tag::directive(calls)
 }
 
-simple_target -> super::Tag = name:ident {
-    super::Tag::target(name, vec![])
+pub target_simple -> Tag = name:ident {
+    Tag::target(name, vec![])
 }
 
-target_with_calls -> super::Tag = name:ident ws calls:(call ** ws) {
-    super::Tag::target(name, calls)
+pub target_with_calls -> Tag = name:ident ws calls:(call ** ws) {
+    Tag::target(name, calls)
 }
 
-//pub target -> super::Tag = target_with_calls / simple_target
-
-pub tag -> super::Tag = "[" choice:(target_with_calls / directive / simple_target) "]" {
-    println!("{:#?}", choice);
-    choice
+pub tag_target -> Tag = "[" t:(target_with_calls / target_simple) "]" {
+    t
 }
+
+pub tag_directive -> Tag = "[" d:(directive) "]" {
+    d
+}
+
+pub tag -> Tag = tag_directive / tag_target
