@@ -18,6 +18,14 @@ pylint *.py
 This defines a target called `lint`. Running `sate lint` calls `pylint
 *.py`.
 
+## Usage
+
+To install `sate`, just run `cargo install sate`.
+
+To use a target, run `sate <target-name>`.
+
+To list targets, run `sate --list` or `sate -l`.
+
 ## Syntax
 
 A target begins with a bracketed name on its own line, for example
