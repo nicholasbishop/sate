@@ -42,10 +42,12 @@ command_code -> String = code:$(not_eol+) {
     code.to_string()
 }
 
-pub command -> Command = directive:tag_directive? code:command_code eol {
+pub command -> Command = directive:tag_directive? !tag_target_header code:command_code eol {
     Command::new(directive, code)
 }
 
 pub target -> Target = header:tag_target_header eol commands:command+ {
     Target { header, commands }
 }
+
+pub satefile -> Vec<Target> = target*

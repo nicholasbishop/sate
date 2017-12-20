@@ -51,6 +51,12 @@ pub struct Target {
     commands: Vec<Command>,
 }
 
+impl Target {
+    fn new(header: TargetHeader, commands: Vec<Command>) -> Target {
+        Target { header: header, commands: commands }
+    }
+}
+
 mod parse {
     include!(concat!(env!("OUT_DIR"), "/sate.rs"));
 }
@@ -103,13 +109,26 @@ mod tests {
     #[test]
     fn test_command() {
         assert_eq!(parse::command("a\n").unwrap(), Command::new(None, "a"));
+        assert!(parse::command("[a]\n").is_err());
     }
 
     #[test]
     fn test_target() {
-        assert_eq!(parse::target("[a]\nfoo\n").unwrap(), Target {
-            header: TargetHeader::new("a", vec![]),
-            commands: vec![Command::new(None, "foo")]
-        });
+        assert_eq!(parse::target("[a]\nfoo\n").unwrap(),
+                   Target::new(
+                       TargetHeader::new("a", vec![]),
+                       vec![Command::new(None, "foo")]));
+    }
+
+    #[test]
+    fn test_satefile() {
+        assert_eq!(parse::satefile("[a]\nb\n[c]\nd\n").unwrap(), vec![
+            Target::new(
+                TargetHeader::new("a", vec![]),
+                vec![Command::new(None, "b")]),
+            Target::new(
+                TargetHeader::new("c", vec![]),
+                vec![Command::new(None, "d")])
+        ]);
     }
 }
