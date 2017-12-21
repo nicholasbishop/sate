@@ -118,16 +118,19 @@ fn print_targets(satefile: &SateFile) {
     }
 }
 
-fn main() {
-    // TODO(nicholasbishop): add command line option for file and
-    // target
-    let matches = App::new("sate")
+fn new_app<'a, 'b>() -> App<'a, 'b> {
+    App::new("sate")
         .about("Run a task")
         .version("0.1.0")
         .args_from_usage(
             "-l, --list 'list all targets'
              [TARGET]   'name of target to execute'")
-        .get_matches();
+}
+
+fn main() {
+    // TODO(nicholasbishop): add command line option for file and
+    // target
+    let matches = new_app().get_matches();
 
     let default_path = Path::new(".satefile");
     // TODO(nicholasbishop): fix unwrap
@@ -139,5 +142,16 @@ fn main() {
         satefile.run_target(target);
     } else {
         println!("no target specified");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_app() {
+        let matches = new_app().get_matches_from(vec!["sate", "-l"]);
+        assert!(matches.is_present("list"));
     }
 }

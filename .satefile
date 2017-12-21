@@ -1,16 +1,2 @@
-[lint]
-pylint sate.py test_sate.py
-
-[format]
-yapf -i sate.py test_sate.py
-
-[package dep(bump_minor)]
-# Clear out existing packages first
-[nofail] rm -r dist
-./setup.py sdist bdist_wheel
-
-[publish dep(package)]
-twine upload dist/*
-
-[bump-minor dep(format, lint)]
-bumpversion minor \ No newline at end of file
+[package]
+cargo package
