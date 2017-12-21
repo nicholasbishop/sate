@@ -8,6 +8,7 @@ repository = "https://github.com/nicholasbishop/sate"
 
 [dependencies]
 clap = "2"
+failure = "^0.1.1"
 subprocess = "^0.1.12"
 
 [build-dependencies]

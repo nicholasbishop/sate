@@ -1,14 +1,17 @@
 extern crate clap;
+extern crate failure;
 extern crate subprocess;
 
 mod parse;
 
 use clap::App;
+use failure::Error;
 use parse::ParseError;
 use std::collections::HashMap;
 use std::fs::File;
+use std::io;
 use std::io::Read;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Call {
@@ -127,14 +130,37 @@ fn new_app<'a, 'b>() -> App<'a, 'b> {
              [TARGET]   'name of target to execute'")
 }
 
+fn dir_contains_satefile(dir: &Path) -> Option<PathBuf> {
+    let name = ".satefile";
+    let path = dir.join(name);
+    if path.exists() {
+        Some(path)
+    } else {
+        None
+    }
+}
+
+fn find_satefile() -> Result<PathBuf, Error> {
+    let mut dir = PathBuf::from(".").canonicalize()?;
+    loop {
+        if let Some(path) = dir_contains_satefile(&dir) {
+            return Ok(path);
+        } else if !dir.pop() {
+            // TODO, not sure how to do this right yet
+            return Err(io::Error::new(io::ErrorKind::NotFound,
+                                      ".satefile not found").into());
+        }
+    }
+}
+
 fn main() {
     // TODO(nicholasbishop): add command line option for file and
     // target
     let matches = new_app().get_matches();
 
-    let default_path = Path::new(".satefile");
+    let default_path = find_satefile().unwrap();
     // TODO(nicholasbishop): fix unwrap
-    let satefile = SateFile::parse_from_file(default_path).unwrap();
+    let satefile = SateFile::parse_from_file(&default_path).unwrap();
 
     if matches.is_present("list") {
         print_targets(&satefile);
