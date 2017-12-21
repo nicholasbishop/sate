@@ -2,7 +2,8 @@
 
 `sate` is a simple replacement for some of what`make` can do. `sate`
 focuses on task automation rather than building. By default `sate`
-looks for a file called `.satefile`.
+looks for a file called `.satefile` (and searches upwards through
+parent directories).
 
 * https://crates.io/crates/sate
 * https://github.com/nicholasbishop/sate
@@ -20,7 +21,10 @@ This defines a target called `lint`. Running `sate lint` calls `pylint
 
 ## Usage
 
-To install `sate`, just run `cargo install sate`. You can also download the [latest release build](https://github.com/nicholasbishop/sate/releases) directly from Github.
+To install `sate`, just run `cargo install sate`. You can also
+download the [latest release
+build](https://github.com/nicholasbishop/sate/releases) directly from
+Github.
 
 To use a target, run `sate <target-name>`.
 
@@ -39,6 +43,9 @@ Each command can optionally begin with a directive, which is a
 bracketed list of calls. Example: `[nofail()] mkdir test`. This
 defines a `mkdir` command that never fails, i.e. a non-zero exit code
 is ignored.
+
+Unlike Makefiles, a target is `sate` doesn't check for a file of that
+name, so there's no need for a `.PHONY` equivalent.
 
 ## TODO
 
