@@ -20,7 +20,7 @@ This defines a target called `lint`. Running `sate lint` calls `pylint
 
 ## Usage
 
-To install `sate`, just run `cargo install sate`.
+To install `sate`, just run `cargo install sate`. You can also download the [latest release build](https://github.com/nicholasbishop/sate/releases) directly from Github.
 
 To use a target, run `sate <target-name>`.
 
