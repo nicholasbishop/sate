@@ -1,6 +1,8 @@
 extern crate clap;
 extern crate subprocess;
 
+mod parse;
+
 use clap::App;
 use parse::ParseError;
 use std::collections::HashMap;
@@ -110,10 +112,6 @@ impl SateFile {
     }
 }
 
-mod parse {
-    include!(concat!(env!("OUT_DIR"), "/sate.rs"));
-}
-
 fn print_targets(satefile: &SateFile) {
     for (name, _target) in satefile.targets.iter() {
         println!("{}", name);
@@ -141,75 +139,5 @@ fn main() {
         satefile.run_target(target);
     } else {
         println!("no target specified");
-    }
-}
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_ident() {
-        assert_eq!(parse::ident("abc").unwrap(), "abc");
-        assert_eq!(parse::ident("abc123").unwrap(), "abc123");
-        assert!(parse::ident("123").is_err());
-    }
-
-    #[test]
-    fn test_arg_list() {
-        assert_eq!(parse::arg_list("a b c").unwrap(), vec!["a", "b", "c"]);
-    }
-
-    #[test]
-    fn test_call() {
-        assert_eq!(parse::call("a()").unwrap(), Call::new("a", vec![]));
-        assert_eq!(parse::call("a(b cd)").unwrap(), Call::new("a", vec!["b", "cd"]));
-    }
-
-    #[test]
-    fn test_tag_directive() {
-        assert_eq!(parse::tag_directive("[a()]").unwrap(),
-                   Directive(vec![Call::new("a", vec![])]));
-    }
-
-    #[test]
-    fn test_tag_target_simple() {
-        assert_eq!(parse::tag_target_header("[a]").unwrap(),
-                   TargetHeader::new("a", vec![]));
-    }
-
-    #[test]
-    fn test_tag_target_with_call() {
-        assert_eq!(parse::tag_target_header("[a b()]").unwrap(),
-                   TargetHeader::new("a", vec![Call::new("b", vec![])]));
-    }
-
-    #[test]
-    fn test_command() {
-        assert_eq!(parse::command("a\n").unwrap(), Command::new(None, "a"));
-        assert!(parse::command("[a]\n").is_err());
-    }
-
-    #[test]
-    fn test_target() {
-        assert_eq!(parse::target("[a]\nfoo\n").unwrap(),
-                   Target::new(
-                       TargetHeader::new("a", vec![]),
-                       vec![Command::new(None, "foo")]));
-    }
-
-    #[test]
-    fn test_satefile() {
-        let mut satefile = SateFile::new();
-        satefile.add_target(Target::new(
-            TargetHeader::new("a", vec![]),
-            vec![Command::new(None, "b")]));
-        satefile.add_target(Target::new(
-            TargetHeader::new("c", vec![]),
-            vec![Command::new(None, "d")]));
-        assert_eq!(
-            parse::satefile("[a]\nb\n\n[c]\nd\n").unwrap(),
-            satefile);
     }
 }
