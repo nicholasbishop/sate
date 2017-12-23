@@ -1,0 +1,5 @@
+[lint]
+pylint sate/*.py test/*.py
+
+[format]
+yapf -i sate/*.py test/*.py
