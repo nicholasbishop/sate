@@ -1,8 +1,9 @@
+import io
 import logging
 import unittest
 
-from sate.parse import compose, parse_directives, parse_line
-from sate.types import Command, Comment, Directive, Target
+from sate.parse import compose, load_satefile, parse_directives, parse_line
+from sate.types import Command, Comment, Directive, Satefile, Target
 
 
 class TestParseDirectives(unittest.TestCase):
@@ -54,6 +55,15 @@ class TestCompose(unittest.TestCase):
 
     def test_simple_target(self):
         self.check([Target('a'), Command('b')], [Target('a', [Command('b')])])
+
+
+class TestFullFile(unittest.TestCase):
+    def check(self, src, expected):
+        rfile = io.StringIO(unicode(src))
+        self.assertEqual(load_satefile(rfile), expected)
+
+    def test_empty(self):
+        self.check('', Satefile())
 
 
 logging.basicConfig(level=logging.DEBUG)

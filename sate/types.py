@@ -1,3 +1,4 @@
+import collections
 import subprocess
 
 import attr
@@ -42,7 +43,7 @@ class Target(object):
 
 @attr.s
 class Satefile(object):
-    targets = attr.ib()
+    targets = attr.ib(default=attr.Factory(collections.OrderedDict))
 
     def run(self, target_name, args):
         self.targets[target_name].run(args)
