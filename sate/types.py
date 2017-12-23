@@ -2,6 +2,11 @@ import subprocess
 
 import attr
 
+@attr.s(frozen=True, slots=True)
+class Directive(object):
+    name = attr.ib()
+    args = attr.ib(default=attr.Factory(list))
+
 
 @attr.s(frozen=True, slots=True)
 class Command(object):

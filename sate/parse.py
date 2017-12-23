@@ -1,6 +1,8 @@
 import collections
 import logging
 
+import parsec
+
 from sate import types
 
 LOG = logging.getLogger(__name__)
@@ -8,6 +10,27 @@ LOG = logging.getLogger(__name__)
 
 class ParseError(ValueError):
     pass
+
+
+IDENTIFIER = ident = parsec.regex(r'[^ \t\(\)]+')
+WHITESPACE = parsec.regex(r'[ \t]+')
+
+
+def parse_call():
+    open_paren = parsec.string('(')
+    close_paren = parsec.string(')')
+    arg_list = open_paren >> parsec.sepBy(IDENTIFIER, WHITESPACE) << close_paren
+    return IDENTIFIER + arg_list
+
+
+def parse_directives(text):
+    directive = parse_call() ^ IDENTIFIER
+    directive_list = parsec.sepBy(directive, WHITESPACE)
+    for elem in directive_list.parse(text):
+        if isinstance(elem, tuple):
+            yield types.Directive(*elem)
+        else:
+            yield types.Directive(elem)
 
 
 def parse_line(line):
@@ -40,7 +63,7 @@ def parse_line(line):
     command = types.Command(text=command_text)
 
     if tag_text and command.text:
-        yield command.with_directives(tag_text)
+        yield command.with_directives(list(parse_directives(tag_text)))
     elif tag_text:
         yield types.Target(tag_text)
     elif command.text:
