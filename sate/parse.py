@@ -23,6 +23,9 @@ class Target(object):
     name = attr.ib()
     commands = attr.ib(default=attr.Factory(list))
 
+    def add_command(self, command):
+        return Target(name=self.name, commands=self.commands + [command])
+
 
 class ParseError(ValueError):
     pass
@@ -71,7 +74,7 @@ def parse_line(line):
 def compose(elements):
     target = None
     for elem in elements:
-        # Throw out comments for now
+        LOG.debug('target: %s, elem: %s', target, elem)
         if isinstance(elem, Comment):
             yield elem
         elif isinstance(elem, Target):
@@ -80,10 +83,16 @@ def compose(elements):
             else:
                 yield target
                 target = elem
-        else:
+        elif isinstance(elem, Command):
             if target is None:
                 raise ParseError('invalid command: outside of target')
             else:
-                yield target.add_command(elem)
+                target = target.add_command(elem)
+        else:
+            raise TypeError('unexpected element type')
     if target:
         yield target
+
+
+def parse_file(rfile):
+    return compose(parse_line(line) for line in rfile.readlines())

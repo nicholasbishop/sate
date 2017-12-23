@@ -1,3 +1,4 @@
+import logging
 import unittest
 
 from sate.parse import Command, Comment, Target, compose, parse_line
@@ -23,8 +24,18 @@ class TestParseLine(unittest.TestCase):
 
 
 class TestCompose(unittest.TestCase):
+    def check(self, src, expected):
+        self.assertEqual(list(compose(src)), expected)
+
     def test_empty(self):
-        self.assertEqual(list(compose([])), [])
+        self.check([], [])
 
     def test_empty_target(self):
-        self.assertEqual(list(compose([Target('a')])), [Target('a')])
+        self.check([Target('a')], [Target('a')])
+
+    def test_simple_target(self):
+        self.check([Target('a'), Command('b')],
+                   [Target('a', [Command('b')])])
+
+
+logging.basicConfig(level=logging.DEBUG)
