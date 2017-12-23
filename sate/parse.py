@@ -1,30 +1,9 @@
-import attr
+import collections
 import logging
 
+from sate import types
+
 LOG = logging.getLogger(__name__)
-
-
-@attr.s(frozen=True, slots=True)
-class Command(object):
-    text = attr.ib()
-    directives = attr.ib(default=attr.Factory(list))
-
-    def with_directives(self, directives):
-        return Command(text=self.text, directives=directives)
-
-
-@attr.s(frozen=True, slots=True)
-class Comment(object):
-    text = attr.ib()
-
-
-@attr.s(frozen=True, slots=True)
-class Target(object):
-    name = attr.ib()
-    commands = attr.ib(default=attr.Factory(list))
-
-    def add_command(self, command):
-        return Target(name=self.name, commands=self.commands + [command])
 
 
 class ParseError(ValueError):
@@ -57,42 +36,61 @@ def parse_line(line):
 
     # Get command text
     post_tag_start = 0 if not has_tag else tag_end + 1
-    command = Command(text=line[post_tag_start:pre_comment_end].strip())
+    command_text = line[post_tag_start:pre_comment_end].strip()
+    command = types.Command(text=command_text)
 
     if tag_text and command.text:
         yield command.with_directives(tag_text)
     elif tag_text:
-        yield Target(tag_text)
+        yield types.Target(tag_text)
     elif command.text:
         yield command
-    
+
     # Get comment
     if has_comment:
-        yield Comment(line[comment_start + 1:])
+        yield types.Comment(line[comment_start + 1:])
 
 
 def compose(elements):
     target = None
     for elem in elements:
         LOG.debug('target: %s, elem: %s', target, elem)
-        if isinstance(elem, Comment):
+        if isinstance(elem, types.Comment):
             yield elem
-        elif isinstance(elem, Target):
+        elif isinstance(elem, types.Target):
             if target is None:
                 target = elem
             else:
                 yield target
                 target = elem
-        elif isinstance(elem, Command):
+        elif isinstance(elem, types.Command):
             if target is None:
                 raise ParseError('invalid command: outside of target')
             else:
                 target = target.add_command(elem)
         else:
-            raise TypeError('unexpected element type')
+            raise TypeError('unexpected element type: {}'.format(elem))
     if target:
         yield target
 
 
 def parse_file(rfile):
-    return compose(parse_line(line) for line in rfile.readlines())
+    def gen():
+        for line in rfile.readlines():
+            parsed = parse_line(line)
+            for elem in parsed:
+                yield elem
+
+    return compose(gen())
+
+
+def load_satefile(rfile):
+    targets = collections.OrderedDict()
+    for elem in parse_file(rfile):
+        if isinstance(elem, types.Target):
+            name = elem.name
+            if name in targets:
+                raise KeyError('duplicate target: ' + name)
+            else:
+                targets[name] = elem
+    return types.Satefile(targets=targets)

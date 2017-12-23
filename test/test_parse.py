@@ -1,7 +1,9 @@
 import logging
 import unittest
 
-from sate.parse import Command, Comment, Target, compose, parse_line
+from sate.parse import compose, parse_line
+from sate.types import Command, Comment, Target
+
 
 class TestParseLine(unittest.TestCase):
     def check(self, src, expected):
@@ -34,8 +36,7 @@ class TestCompose(unittest.TestCase):
         self.check([Target('a')], [Target('a')])
 
     def test_simple_target(self):
-        self.check([Target('a'), Command('b')],
-                   [Target('a', [Command('b')])])
+        self.check([Target('a'), Command('b')], [Target('a', [Command('b')])])
 
 
 logging.basicConfig(level=logging.DEBUG)
