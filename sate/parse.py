@@ -33,10 +33,6 @@ class Rule:
                  << CloseBracket)
 
 
-def parse_command_tag(text):
-    return OPEN_BRACKET >> parse_directives
-
-
 def parse_line(line):
     comment_start = line.find('#')
     LOG.debug('comment_start: %s', comment_start)
