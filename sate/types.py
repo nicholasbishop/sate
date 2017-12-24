@@ -1,7 +1,9 @@
 import collections
+import copy
 import subprocess
 
 import attr
+import dag
 
 
 @attr.s(frozen=True, slots=True)
@@ -41,16 +43,51 @@ class Target(object):
     def add_command(self, command):
         return Target(name=self.name, commands=self.commands + [command])
 
+    def deps(self):
+        for directive in self.directives:
+            if directive.name == 'deps':
+                return directive.args
+        return []
+
     def run(self, args):
         for command in self.commands:
             command.run(args)
 
 
-@attr.s
+def target_list_to_dict(lst):
+    lst = lst or []
+    dct = collections.OrderedDict()
+    for target in lst:
+        if target.name in dct:
+            raise KeyError('duplicate target name: ' + target.name)
+        dct[target.name] = target
+    return dct
+
+
+@attr.s(frozen=True, slots=True)
 class Satefile(object):
-    targets = attr.ib(default=attr.Factory(collections.OrderedDict))
+    targets = attr.ib(default=attr.Factory(collections.OrderedDict),
+                      validator=attr.validators.instance_of(
+                          collections.abc.Mapping),
+                      convert=target_list_to_dict)
 
     def run(self, target_name, args):
         if target_name not in self.targets:
             exit('error: unknown target')
         self.targets[target_name].run(args)
+
+    def deps(self, original_target):
+        graph = dag.DAG()
+
+        remaining = [original_target]
+        while remaining:
+            target = remaining.pop()
+            graph.add_node_if_not_exists(target)
+            deps = self.targets[target].deps()
+            for dep in deps:
+                graph.add_node_if_not_exists(dep)
+                graph.add_edge(target, dep)
+            remaining += deps
+
+        return [original_target] + graph.all_downstreams(original_target)
+        

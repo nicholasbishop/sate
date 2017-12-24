@@ -88,12 +88,8 @@ def parse_file(rfile):
 
 
 def load_satefile(rfile):
-    targets = collections.OrderedDict()
+    targets = []
     for elem in parse_file(rfile):
         if isinstance(elem, types.Target):
-            name = elem.name
-            if name in targets:
-                raise KeyError('duplicate target: ' + name)
-            else:
-                targets[name] = elem
-    return types.Satefile(targets=targets)
+            targets.append(elem)
+    return types.Satefile(targets)

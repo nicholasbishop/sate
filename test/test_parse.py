@@ -3,7 +3,7 @@ import logging
 import unittest
 
 from sate.parse import compose, load_satefile, parse_line
-from sate.types import Command, Comment, Directive, Satefile, Target
+from sate.types import Call, Command, Comment, Satefile, Target
 
 
 class TestParseLine(unittest.TestCase):
@@ -23,7 +23,7 @@ class TestParseLine(unittest.TestCase):
         self.check('[a] #b', [Target('a'), Comment('b')])
 
     def test_directive(self):
-        self.check('[a] b', [Command(directives=[Directive('a')], text='b')])
+        self.check('[a] b', [Command(directives=[Call('a')], text='b')])
 
 
 class TestCompose(unittest.TestCase):
