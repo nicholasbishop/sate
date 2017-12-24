@@ -6,3 +6,5 @@ pipenv run yapf -i sate/*.py test/*.py
 
 [test]
 pipenv run python -m unittest discover
+
+[sanity deps(format, lint, test)]
