@@ -42,8 +42,7 @@ def parse_line(line):
     command = types.Command(text=command_text)
 
     if tag_text and command.text:
-        yield command.with_directives(
-            list(rules.CommandTag.parse(tag_text)))
+        yield command.with_directives(list(rules.CommandTag.parse(tag_text)))
     elif tag_text:
         yield rules.TargetTag.parse(tag_text)
     elif command.text:

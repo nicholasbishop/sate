@@ -19,8 +19,8 @@ def print_targets(satefile):
 
 def run():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-l', '--list', help='list targets',
-                        action='store_true')
+    parser.add_argument(
+        '-l', '--list', help='list targets', action='store_true')
     parser.add_argument('target', nargs='?')
     parser.add_argument('args', nargs=argparse.REMAINDER)
     args = parser.parse_args()

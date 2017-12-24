@@ -66,14 +66,16 @@ def target_list_to_dict(lst):
 
 @attr.s(frozen=True, slots=True)
 class Satefile(object):
-    targets = attr.ib(default=attr.Factory(collections.OrderedDict),
-                      validator=attr.validators.instance_of(
-                          collections.abc.Mapping),
-                      convert=target_list_to_dict)
+    targets = attr.ib(
+        default=attr.Factory(collections.OrderedDict),
+        validator=attr.validators.instance_of(collections.abc.Mapping),
+        convert=target_list_to_dict)
 
     def run(self, target_name, args):
         if target_name not in self.targets:
             exit('error: unknown target')
+        for dep in reversed(self.deps(target_name)):
+            self.targets[dep].run(args)
         self.targets[target_name].run(args)
 
     def deps(self, original_target):
@@ -89,5 +91,4 @@ class Satefile(object):
                 graph.add_edge(target, dep)
             remaining += deps
 
-        return [original_target] + graph.all_downstreams(original_target)
-        
+        return graph.all_downstreams(original_target)

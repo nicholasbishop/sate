@@ -21,6 +21,4 @@ class TestDeps(unittest.TestCase):
         t_c = types.Target('c')
         t_d = types.Target('d')
         satefile = types.Satefile((t_a, t_b, t_c, t_d))
-        self.assertIn(satefile.deps('a'),
-                      (['a', 'b', 'c', 'd'],
-                       ['a', 'b', 'd', 'c']))
+        self.assertIn(satefile.deps('a'), (['b', 'c', 'd'], ['b', 'd', 'c']))
