@@ -34,7 +34,7 @@ def parse_line(line):
     elif tag_end < tag_start:
         raise ParseError('unexpected "]"')
     elif has_tag:
-        tag_text = line[tag_start + 1:tag_end]
+        tag_text = line[tag_start:tag_end + 1]
 
     # Get command text
     post_tag_start = 0 if not has_tag else tag_end + 1
@@ -43,9 +43,9 @@ def parse_line(line):
 
     if tag_text and command.text:
         yield command.with_directives(
-            list(rules.DirectiveList.parse(tag_text)))
+            list(rules.CommandTag.parse(tag_text)))
     elif tag_text:
-        yield types.Target(tag_text)
+        yield rules.TargetTag.parse(tag_text)
     elif command.text:
         yield command
 

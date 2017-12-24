@@ -14,12 +14,11 @@ Whitespace = regex(r'[ \t]+')
 Ident = regex(r'[^ \t\(\)\[\]]+')
 
 ArgList = OpenParen >> Ident.sep_by(Whitespace) << CloseParen
-Call = seq(Ident, ArgList)
+Call = seq(Ident, ArgList).combine(types.Call) | Ident.map(types.Call)
 
-Directive = (Call | Ident).combine(types.Directive)
-DirectiveList = Directive.sep_by(Whitespace)
+CallList = Call.sep_by(Whitespace)
 
-CommandTag = OpenBrack >> DirectiveList << CloseBrack
+CommandTag = OpenBrack >> CallList << CloseBrack
 
 
 def _make_target(name, _, directives):
@@ -27,9 +26,9 @@ def _make_target(name, _, directives):
     return types.Target(name=name, directives=directives)
 
 
-TargetTagContentWithDirectives = (seq(Ident, Whitespace, DirectiveList)
-                                  .combine(_make_target))
-TargetTagContentSimple = Ident.combine(types.Target)
+TargetTagContentWithCalls = (seq(Ident, Whitespace, CallList)
+                             .combine(_make_target))
+TargetTagContentSimple = Ident.map(types.Target)
 
-TargetTagContent = TargetTagContentWithDirectives | TargetTagContentSimple
+TargetTagContent = TargetTagContentWithCalls | TargetTagContentSimple
 TargetTag = OpenBrack >> TargetTagContent << CloseBrack

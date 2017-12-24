@@ -5,8 +5,8 @@ import attr
 
 
 @attr.s(frozen=True, slots=True)
-class Directive(object):
-    name = attr.ib()
+class Call(object):
+    name = attr.ib(validator=attr.validators.instance_of(str))
     args = attr.ib(default=attr.Factory(list))
 
 
