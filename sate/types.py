@@ -20,7 +20,10 @@ class Command(object):
     def run(self, extra_args):
         cmd = ' '.join([self.text] + extra_args)
         print(cmd)
-        subprocess.check_call(cmd, shell=True)
+        try:
+            subprocess.check_call(cmd, shell=True)
+        except subprocess.CalledProcessError as err:
+            print('failed with exit code {}'.format(err.returncode))
 
 
 @attr.s(frozen=True, slots=True)
