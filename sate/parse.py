@@ -1,7 +1,7 @@
 import collections
 import logging
 
-import parsec
+import parsy
 
 from sate import types
 
@@ -12,25 +12,21 @@ class ParseError(ValueError):
     pass
 
 
-IDENTIFIER = ident = parsec.regex(r'[^ \t\(\)]+')
-WHITESPACE = parsec.regex(r'[ \t]+')
+IDENTIFIER = parsy.regex(r'[^ \t\(\)]+')
+WHITESPACE = parsy.regex(r'[ \t]+')
 
 
 def parse_call():
-    open_paren = parsec.string('(')
-    close_paren = parsec.string(')')
-    arg_list = open_paren >> parsec.sepBy(IDENTIFIER, WHITESPACE) << close_paren
-    return IDENTIFIER + arg_list
+    open_paren = parsy.string('(')
+    close_paren = parsy.string(')')
+    arg_list = open_paren >> IDENTIFIER.sep_by(WHITESPACE) << close_paren
+    return parsy.seq(IDENTIFIER, arg_list)
 
 
 def parse_directives(text):
-    directive = parse_call() ^ IDENTIFIER
-    directive_list = parsec.sepBy(directive, WHITESPACE)
-    for elem in directive_list.parse(text):
-        if isinstance(elem, tuple):
-            yield types.Directive(*elem)
-        else:
-            yield types.Directive(elem)
+    directive = (parse_call() | IDENTIFIER).combine(types.Directive)
+    directive_list = directive.sep_by(WHITESPACE)
+    return directive_list.parse(text)
 
 
 def parse_line(line):
