@@ -21,9 +21,11 @@ DirectiveList = Directive.sep_by(Whitespace)
 
 CommandTag = OpenBrack >> DirectiveList << CloseBrack
 
+
 def _make_target(name, _, directives):
     """Make a Target from name and directives."""
     return types.Target(name=name, directives=directives)
+
 
 TargetTagContentWithDirectives = (seq(Ident, Whitespace, DirectiveList)
                                   .combine(_make_target))

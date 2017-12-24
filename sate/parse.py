@@ -12,8 +12,6 @@ class ParseError(ValueError):
     pass
 
 
-
-
 def parse_line(line):
     comment_start = line.find('#')
     LOG.debug('comment_start: %s', comment_start)
@@ -44,7 +42,8 @@ def parse_line(line):
     command = types.Command(text=command_text)
 
     if tag_text and command.text:
-        yield command.with_directives(list(rules.DirectiveList.parse(tag_text)))
+        yield command.with_directives(
+            list(rules.DirectiveList.parse(tag_text)))
     elif tag_text:
         yield types.Target(tag_text)
     elif command.text:
