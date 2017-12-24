@@ -51,4 +51,6 @@ class Satefile(object):
     targets = attr.ib(default=attr.Factory(collections.OrderedDict))
 
     def run(self, target_name, args):
+        if target_name not in self.targets:
+            exit('error: unknown target')
         self.targets[target_name].run(args)
