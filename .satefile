@@ -1,5 +1,8 @@
 [lint]
-pylint sate/*.py test/*.py
+pipenv run pylint sate/*.py test/*.py
 
 [format]
-yapf -i sate/*.py test/*.py
+pipenv run yapf -i sate/*.py test/*.py
+
+[test]
+pipenv run python -m unittest discover
