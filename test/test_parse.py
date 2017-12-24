@@ -2,25 +2,8 @@ import io
 import logging
 import unittest
 
-from sate.parse import Rule, compose, load_satefile, parse_line
+from sate.parse import compose, load_satefile, parse_line
 from sate.types import Command, Comment, Directive, Satefile, Target
-
-
-class TestParseDirectives(unittest.TestCase):
-    def check(self, src, expected):
-        self.assertEqual(Rule.DirectiveList.parse(src), expected)
-
-    def test_simple(self):
-        self.check('a', [Directive('a')])
-
-    def test_one_dep(self):
-        self.check('deps(a)', [Directive('deps', ['a'])])
-
-    def test_two_deps(self):
-        self.check('deps(a b)', [Directive('deps', ['a', 'b'])])
-
-    def test_two_directives(self):
-        self.check('a b', [Directive('a'), Directive('b')])
 
 
 class TestParseLine(unittest.TestCase):
