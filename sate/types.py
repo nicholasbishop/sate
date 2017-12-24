@@ -3,6 +3,7 @@ import subprocess
 
 import attr
 
+
 @attr.s(frozen=True, slots=True)
 class Directive(object):
     name = attr.ib()

@@ -29,8 +29,7 @@ class Rule:
     DirectiveList = Directive.sep_by(Whitespace)
 
     CommandTag = OpenBracket >> DirectiveList << CloseBracket
-    TargetTag = (OpenBracket >>
-                 parsy.seq(Identifier, DirectiveList.optional())
+    TargetTag = (OpenBracket >> parsy.seq(Identifier, DirectiveList.optional())
                  << CloseBracket)
 
 
