@@ -9,6 +9,7 @@ name = "pypi"
 
 parsy = "*"
 attrs = "*"
+"py-dag" = "*"
 
 
 [dev-packages]
