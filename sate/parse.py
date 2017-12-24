@@ -12,21 +12,30 @@ class ParseError(ValueError):
     pass
 
 
-IDENTIFIER = parsy.regex(r'[^ \t\(\)]+')
-WHITESPACE = parsy.regex(r'[ \t]+')
+class Rule:
+    OpenParen = parsy.string('(')
+    CloseParen = parsy.string(')')
+
+    OpenBracket = parsy.string('[')
+    CloseBracket = parsy.string(']')
+
+    Whitespace = parsy.regex(r'[ \t]+')
+    Identifier = parsy.regex(r'[^ \t\(\)]+')
+
+    ArgList = OpenParen >> Identifier.sep_by(Whitespace) << CloseParen
+    Call = parsy.seq(Identifier, ArgList)
+
+    Directive = (Call | Identifier).combine(types.Directive)
+    DirectiveList = Directive.sep_by(Whitespace)
+
+    CommandTag = OpenBracket >> DirectiveList << CloseBracket
+    TargetTag = (OpenBracket >>
+                 parsy.seq(Identifier, DirectiveList.optional())
+                 << CloseBracket)
 
 
-def parse_call():
-    open_paren = parsy.string('(')
-    close_paren = parsy.string(')')
-    arg_list = open_paren >> IDENTIFIER.sep_by(WHITESPACE) << close_paren
-    return parsy.seq(IDENTIFIER, arg_list)
-
-
-def parse_directives(text):
-    directive = (parse_call() | IDENTIFIER).combine(types.Directive)
-    directive_list = directive.sep_by(WHITESPACE)
-    return directive_list.parse(text)
+def parse_command_tag(text):
+    return OPEN_BRACKET >> parse_directives
 
 
 def parse_line(line):
@@ -59,7 +68,7 @@ def parse_line(line):
     command = types.Command(text=command_text)
 
     if tag_text and command.text:
-        yield command.with_directives(list(parse_directives(tag_text)))
+        yield command.with_directives(list(Rule.DirectiveList.parse(tag_text)))
     elif tag_text:
         yield types.Target(tag_text)
     elif command.text:

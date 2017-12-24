@@ -35,6 +35,7 @@ class Comment(object):
 class Target(object):
     name = attr.ib()
     commands = attr.ib(default=attr.Factory(list))
+    directives = attr.ib(default=attr.Factory(list))
 
     def add_command(self, command):
         return Target(name=self.name, commands=self.commands + [command])
