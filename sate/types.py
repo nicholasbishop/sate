@@ -3,7 +3,7 @@ import copy
 import subprocess
 
 import attr
-import dag
+import toposort
 
 
 DEPS_KEY = 'deps'
@@ -72,7 +72,7 @@ class Target(object):
         for dep in new_deps:
             if dep not in deps:
                 deps.append(dep)
-        directives.append(Call(self.DepsKey, deps))
+        directives.append(Call(DEPS_KEY, deps))
         return Target(name=self.name, commands=commands, directives=directives)
 
 
@@ -86,27 +86,24 @@ def target_list_to_dict(lst):
     return dct
 
 
-def add_hard_deps(graph, original_target, all_targets):
-    remaining = [original_target]
-    while remaining:
-        target = remaining.pop()
-        graph.add_node_if_not_exists(target)
+def make_target_graph(all_targets, original_target):
+    graph = {}
+
+    def init_node(target):
+        if target not in graph:
+            graph[target] = set()
+
+    stack = [original_target]
+    while stack:
+        target = stack.pop()
+        init_node(target)
         deps = all_targets[target].deps()
         for dep in deps:
-            graph.add_node_if_not_exists(dep)
-            graph.add_edge(target, dep)
-        remaining += deps
+            init_node(dep)
+            graph[target].add(dep)
+        stack += deps
 
-
-def add_soft_deps(graph, original_target, all_targets):
-    hard_deps = graph.all_downstreams(original_target)
-    for target in hard_deps:
-        deps = all_targets[target].deps()
-        for dep1, dep2 in zip(deps, deps[1:]):
-            try:
-                graph.add_edge(dep2, dep1)
-            except dag.DAGValidationError:
-                pass
+    return graph
 
 
 @attr.s(frozen=True, slots=True)
@@ -123,8 +120,6 @@ class Satefile(object):
             self.targets[dep].run(args)
         self.targets[target_name].run(args)
 
-    def deps(self, original_target):
-        graph = dag.DAG()
-        add_hard_deps(graph, original_target, self.targets)
-        add_soft_deps(graph, original_target, self.targets)
-        return graph.all_downstreams(original_target)
+    def run_order(self, target):
+        graph = make_target_graph(self.targets, target)
+        return list(toposort.toposort_flatten(graph))

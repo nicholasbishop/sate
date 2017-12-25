@@ -1,3 +1,4 @@
+import collections
 import unittest
 
 from sate import types
@@ -16,6 +17,29 @@ class TestSeparateDeps(unittest.TestCase):
     def test_both(self):
         self.check([types.Call('deps', ['a']), types.Call('b')],
                    (['a'], [types.Call('b')]))
+
+class TestMakeTargetGraph(unittest.TestCase):
+    def setUp(self):
+        self.targets = collections.OrderedDict([
+            ('a', types.Target('a').with_deps('b c d')),
+            ('b', types.Target('b').with_deps('c')),
+            ('c', types.Target('c').with_deps('d')),
+            ('d', types.Target('d')),
+        ])
+
+    def test_from_b(self):
+        graph = types.make_target_graph(self.targets, 'b')
+        self.assertEqual(graph, {
+            'b': set(['c']),
+            'c': set(['d']),
+            'd': set(),
+        })
+
+    def test_from_d(self):
+        graph = types.make_target_graph(self.targets, 'd')
+        self.assertEqual(graph, {
+            'd': set(),
+        })
 
 
 class TestDeps(unittest.TestCase):
@@ -36,7 +60,7 @@ class TestDeps(unittest.TestCase):
         t_c = types.Target('c')
         t_d = types.Target('d')
         satefile = types.Satefile((t_a, t_b, t_c, t_d))
-        self.assertEqual(satefile.deps('a'), ['b', 'c', 'd'])
+        self.assertEqual(satefile.run_order('a'), ['c', 'd', 'b', 'a'])
 
     def test_four_targets(self):
         satefile = types.Satefile([
@@ -44,4 +68,5 @@ class TestDeps(unittest.TestCase):
             types.Target('format'),
             types.Target('test'),
             types.Target('sanity').with_deps('format', 'lint', 'test')])
-        self.assertEqual(satefile.deps('sanity'), ['format', 'lint', 'test'])
+        self.assertEqual(satefile.run_order('sanity'), ['format', 'lint',
+                                                        'test', 'sanity'])

@@ -9,7 +9,7 @@ name = "pypi"
 
 parsy = "*"
 attrs = "*"
-"py-dag" = "*"
+toposort = "*"
 
 
 [dev-packages]
