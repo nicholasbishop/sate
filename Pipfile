@@ -17,6 +17,7 @@ toposort = "*"
 pylint = "*"
 yapf = "*"
 bumpversion = "*"
+twine = "*"
 
 
 [requires]
