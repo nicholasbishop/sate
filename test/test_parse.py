@@ -60,6 +60,3 @@ class TestFullFile(unittest.TestCase):
     #     ''', Satefile([Target('a', [Command('b')]),
     #                    Target('c', [Command('e', Directive('d'))],
     #                           Directive('deps', ['a']))]))
-
-
-logging.basicConfig(level=logging.DEBUG)
