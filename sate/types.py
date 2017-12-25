@@ -5,8 +5,8 @@ import subprocess
 import attr
 import toposort
 
-
 DEPS_KEY = 'deps'
+
 
 @attr.s(frozen=True, slots=True)
 class Call(object):

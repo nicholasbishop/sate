@@ -15,8 +15,9 @@ class TestSeparateDeps(unittest.TestCase):
         self.check([types.Call('deps', ['a'])], (['a'], []))
 
     def test_both(self):
-        self.check([types.Call('deps', ['a']), types.Call('b')],
-                   (['a'], [types.Call('b')]))
+        self.check([types.Call('deps', ['a']),
+                    types.Call('b')], (['a'], [types.Call('b')]))
+
 
 class TestMakeTargetGraph(unittest.TestCase):
     def setUp(self):
@@ -67,6 +68,7 @@ class TestDeps(unittest.TestCase):
             types.Target('lint'),
             types.Target('format'),
             types.Target('test'),
-            types.Target('sanity').with_deps('format', 'lint', 'test')])
-        self.assertEqual(satefile.run_order('sanity'), ['format', 'lint',
-                                                        'test', 'sanity'])
+            types.Target('sanity').with_deps('format', 'lint', 'test')
+        ])
+        self.assertEqual(
+            satefile.run_order('sanity'), ['format', 'lint', 'test', 'sanity'])
