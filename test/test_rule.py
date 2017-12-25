@@ -1,7 +1,5 @@
 import unittest
 
-import parsy
-
 from sate import rules, types
 
 

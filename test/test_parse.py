@@ -1,5 +1,4 @@
 import io
-import logging
 import unittest
 
 from sate.parse import compose, load_satefile, parse_line
