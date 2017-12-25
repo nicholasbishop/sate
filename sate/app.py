@@ -1,6 +1,6 @@
 import argparse
 
-from sate import parse
+from sate import VERSION, parse
 
 
 def find_satefile():
@@ -21,13 +21,16 @@ def run():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-l', '--list', help='list targets', action='store_true')
+    parser.add_argument('--version', action='store_true')
     parser.add_argument('target', nargs='?')
     parser.add_argument('args', nargs=argparse.REMAINDER)
     args = parser.parse_args()
 
     satefile = load_satefile(find_satefile())
 
-    if args.list:
+    if args.version:
+        print(VERSION)
+    elif args.list:
         print_targets(satefile)
     else:
         satefile.run(args.target, args.args)
