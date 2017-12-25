@@ -8,3 +8,8 @@ pipenv run yapf -i sate/*.py test/*.py
 pipenv run python -m unittest discover
 
 [sanity deps(format lint test)]
+
+[package]
+# Clear out existing packages first
+[nofail] rm -r dist
+./setup.py sdist bdist_wheel
