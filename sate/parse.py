@@ -1,7 +1,4 @@
-import collections
 import logging
-
-import parsy
 
 from sate import rules, types
 
