@@ -116,9 +116,8 @@ class Satefile(object):
     def run(self, target_name, args):
         if target_name not in self.targets:
             exit('error: unknown target')
-        for dep in reversed(self.deps(target_name)):
+        for dep in reversed(self.run_order(target_name)):
             self.targets[dep].run(args)
-        self.targets[target_name].run(args)
 
     def run_order(self, target):
         graph = make_target_graph(self.targets, target)
