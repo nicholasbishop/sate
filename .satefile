@@ -1,2 +1,21 @@
+[lint]
+pipenv run pylint sate/*.py test/*.py
+
+[format]
+pipenv run yapf -i sate/*.py test/*.py
+
+[test]
+pipenv run python -m unittest discover
+
+[sanity deps(format lint test)]
+
 [package]
-cargo package
+# Clear out existing packages first
+[nofail] rm -r dist
+./setup.py sdist bdist_wheel
+
+[bump-minor deps(format lint)]
+bumpversion minor
+
+[publish deps(package)]
+twine upload dist/*

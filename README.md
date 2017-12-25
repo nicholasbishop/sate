@@ -5,8 +5,11 @@ focuses on task automation rather than building. By default `sate`
 looks for a file called `.satefile` (and searches upwards through
 parent directories).
 
-* https://crates.io/crates/sate
+This repository contains dueling Python and Rust implementations.
+
 * https://github.com/nicholasbishop/sate
+* https://pypi.python.org/pypi/sate/
+* https://crates.io/crates/sate
 
 ## A very simple example
 
