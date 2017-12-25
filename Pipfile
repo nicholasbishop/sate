@@ -14,6 +14,8 @@ toposort = "*"
 
 [dev-packages]
 
+pylint = "*"
+yapf = "*"
 
 
 [requires]
