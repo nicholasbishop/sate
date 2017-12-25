@@ -18,6 +18,7 @@ pylint = "*"
 yapf = "*"
 bumpversion = "*"
 twine = "*"
+rstcheck = "*"
 
 
 [requires]
