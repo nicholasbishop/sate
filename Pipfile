@@ -16,6 +16,7 @@ toposort = "*"
 
 pylint = "*"
 yapf = "*"
+bumpversion = "*"
 
 
 [requires]
