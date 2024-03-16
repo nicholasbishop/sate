@@ -1,5 +1,7 @@
 # sate
 
+**This tool is no longer under active development. If you are interested in taking over or repurposing the name on crates.io, feel free to contact me: nbishop@nbishop.net**
+
 `sate` is a simple replacement for some of what`make` can do. `sate`
 focuses on task automation rather than building. By default `sate`
 looks for a file called `.satefile` (and searches upwards through
